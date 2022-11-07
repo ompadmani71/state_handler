@@ -1,0 +1,146 @@
+[
+  {
+    "id" : 1,
+    "name": "Avpdac Salad",
+    "category": "Food",
+    "price": 15,
+    "quantity": 0,
+    "isLike": "false",
+    "image": "assets/images/foodDish.png"
+  },
+  {
+    "id" : 2,
+    "name": "Burger",
+    "category": "Food",
+    "price": 8,
+    "quantity": 0,
+    "isLike": "false",
+    "image": "assets/images/burger.png"
+  },
+  {
+    "id" : 3,
+    "name": "Maggi",
+    "category": "Food",
+    "price": 5,
+    "quantity": 0,
+    "isLike": "false",
+    "image": "assets/images/maggi.png"
+  },
+  {
+    "id" : 4,
+    "name": "Special",
+    "category": "Food",
+    "price": 20,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/special.png"
+  },
+  {
+    "id" : 5,
+    "name": "Apple",
+    "category": "Fruit",
+    "price": 12,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/apple.png"
+  },
+  {
+    "id" : 6,
+    "name": "Cherry",
+    "category": "Fruit",
+    "price": 8,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/cherry.png"
+  },
+  {
+    "id" : 7,
+    "name": "Strawberry",
+    "category": "Fruit",
+    "price": 18,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/strawberry.jpg"
+  },
+  {
+    "id" : 8,
+    "name": "Banana",
+    "category": "Fruit",
+    "price": 5,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/banana.png"
+  },
+  {
+    "id" : 9,
+    "name": "Cabbage",
+    "category": "Vegetable",
+    "price": 3,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/cabbage.png"
+  },
+  {
+    "id" : 10,
+    "name": "Broccoli",
+    "category": "Vegetable",
+    "price": 4,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/broccoli.png"
+  },
+  {
+    "id" : 11,
+    "name": "Tomato",
+    "category": "Vegetable",
+    "price": 2,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/tomato.png"
+  },
+  {
+    "id" : 12,
+    "name": "Brinjal",
+    "category": "Vegetable",
+    "price": 2,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/brinjal.png"
+  },
+  {
+    "id" : 13,
+    "name": "Rice",
+    "category": "Grocery",
+    "price": 20,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/rice.jpg"
+  },
+  {
+    "id" : 14,
+    "name": "Chakki Atta",
+    "category": "Grocery",
+    "price": 25,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/chhaki_atta.png"
+  },
+  {
+    "id" : 15,
+    "name": "Sugar",
+    "category": "Grocery",
+    "price": 8,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/sugar.jpg"
+  },
+  {
+    "id" : 16,
+    "name": "Chilli Power",
+    "category": "Grocery",
+    "price": 6,
+    "quantity": 0,
+    "isLike": "false",
+    "image" : "assets/images/chilli_power.jpg"
+  }
+]
