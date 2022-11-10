@@ -144,6 +144,8 @@ class DataBaseController extends GetxController {
      List<Map<String, dynamic>> data = await dbs!.rawQuery(sql);
     cartDishData.value = dishFromJson(jsonEncode(data));
 
+    totalCartItems(0);
+    totalCartPrice(0);
     for(Dish dish in cartDishData){
       totalCartItems.value = totalCartItems.value + dish.quantity!;
     }
