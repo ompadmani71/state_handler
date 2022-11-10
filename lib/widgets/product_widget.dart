@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:state_handler/controller/database_controller.dart';
 import 'package:state_handler/models/product_model.dart';
 import 'package:state_handler/view/detail_screen.dart';
 
 InkWell productContainer(
     {required Size size,
     required Color primaryColor,
-    required Dish product,
     required Function onTap,
-    required int productIndex
-    }) {
+    required int productIndex}) {
+  DataBaseController dataBaseController = Get.find();
+
+  Dish dish = dataBaseController.dishesData[productIndex];
   return InkWell(
-    onTap: (){
-      Get.to(DetailScreen(productIndex: productIndex));
+    onTap: () {
+      Get.to(DetailScreen(productIndex: dish.id!));
     },
     child: Container(
       // width: size.width * 0.43,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          // color: Colors.orange,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(25)),
       child: Stack(
         children: [
@@ -29,13 +31,13 @@ InkWell productContainer(
               children: [
                 Center(
                   child: SizedBox(
-                      height: size.height * 0.1,
+                      height: size.height * 0.15,
                       width: size.height * 0.1,
                       child: Image.asset(
-                        product.image!,
+                        dish.image!,
                       )),
                 ),
-                Text(product.name!),
+                Text(dish.name!),
                 Row(
                   children: [
                     Text(
@@ -52,7 +54,7 @@ InkWell productContainer(
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "\$ ${product.price}",
+                  "\$ ${dish.price}",
                   style: TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 10),
@@ -63,7 +65,7 @@ InkWell productContainer(
             bottom: 0,
             right: 0,
             child: InkWell(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 bottomRight: Radius.circular(25),
                 topLeft: Radius.circular(25),
               ),
@@ -87,15 +89,26 @@ InkWell productContainer(
           Positioned(
               right: 5,
               top: 5,
-              child: (product.isLike! == "True")
-                  ? Icon(
-                      Icons.favorite,
-                      color: Colors.redAccent,
+              child: Obx(() => (dataBaseController.dishesData[productIndex].isLike == "true")
+                  ? IconButton(
+                      onPressed: () async {
+                        await dataBaseController.disLikeDish(id: dish.id!);
+                      },
+                      icon: const Icon(Icons.favorite, color: Colors.redAccent),
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
                     )
-                  : Icon(
-                      Icons.favorite_border,
-                      color: Colors.grey,
-                    ))
+                  : IconButton(
+                      onPressed: () async {
+                        await dataBaseController.likeDish(id: dish.id!);
+                      },
+                      icon: const Icon(
+                        Icons.favorite_border,
+                        color: Colors.grey,
+                      ),
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              )))
         ],
       ),
     ),

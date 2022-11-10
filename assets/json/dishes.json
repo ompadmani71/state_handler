@@ -60,7 +60,7 @@
     "price": 18,
     "quantity": 0,
     "isLike": "false",
-    "image" : "assets/images/strawberry.jpg"
+    "image" : "assets/images/strawberry.png"
   },
   {
     "id" : 8,
@@ -114,7 +114,7 @@
     "price": 20,
     "quantity": 0,
     "isLike": "false",
-    "image" : "assets/images/rice.jpg"
+    "image" : "assets/images/rice.png"
   },
   {
     "id" : 14,
@@ -132,7 +132,7 @@
     "price": 8,
     "quantity": 0,
     "isLike": "false",
-    "image" : "assets/images/sugar.jpg"
+    "image" : "assets/images/sugar.png"
   },
   {
     "id" : 16,
@@ -141,6 +141,6 @@
     "price": 6,
     "quantity": 0,
     "isLike": "false",
-    "image" : "assets/images/chilli_power.jpg"
+    "image" : "assets/images/chilli_power.png"
   }
 ]

@@ -44,33 +44,21 @@ class Dish {
   };
 }
 
-List<Dish> products = [
-  Dish(
-    id: 1,
-    name: "Avpdac Salad",
-    category: "Food",
-    price: 15,
-    quantity: 1,
-    isLike: "false",
-    image: "assets/images/foodDish.png"
-  ),
-  Dish(
-    id: 2,
-    name: "Salad",
-    category: "Food",
-    price: 20,
-    quantity: 1,
-    isLike: "true",
-    image: "assets/images/Like.png"
-  ),
-  Dish(
-    id: 3,
-    name: "Manchurian",
-    category: "Food",
-    price: 5,
-    quantity: 1,
-    isLike: "true",
-    image: "assets/images/unLike.png"
-  ),
+List<String> images = [
+  "assets/images/foodDish.png",
+  "assets/images/burger.png",
+  "assets/images/maggi.png",
+  "assets/images/special.png",
+  "assets/images/apple.png",
+  "assets/images/cherry.png",
+  "assets/images/strawberry.jpg",
+  "assets/images/banana.png",
+  "assets/images/cabbage.png",
+  "assets/images/broccoli.png",
+  "assets/images/tomato.png",
+  "assets/images/brinjal.png",
+  "assets/images/rice.jpg",
+  "assets/images/chhaki_atta.png",
+  "assets/images/sugar.jpg",
+  "assets/images/chilli_power.jpg"
 ];
-

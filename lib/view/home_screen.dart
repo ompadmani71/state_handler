@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:state_handler/controller/database_controller.dart';
 import 'package:state_handler/controller/home_controller.dart';
 
@@ -23,10 +24,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      bool isLoaded = prefs.getBool('isLoaded') ?? false;
 
       await dataBaseController.init();
-      await dataBaseController.loadString(path: "assets/json/dishes.json");
-      await dataBaseController.insertBulkRecord();
+      if (isLoaded == false) {
+        await dataBaseController.loadString(path: "assets/json/dishes.json");
+        await dataBaseController.insertBulkRecord();
+      }
       await dataBaseController.fetchData();
     });
   }
@@ -93,19 +99,35 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   Icon(Icons.search, color: Theme.of(context).primaryColor),
-                  const Text("Search Food",
-                      style: TextStyle(
-                        color: Colors.black45,
-                        fontSize: 15,
-                      )),
-                  const Spacer(),
+                  Expanded(
+                      child: TextField(
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.fromLTRB(10,0,0,0),
+                        hintText: "Search here",
+                        // suffix: InkWell(
+                        //   splashColor: Colors.transparent,
+                        //   highlightColor: Colors.transparent,
+                        //   onTap: () {},
+                        //   child: const Icon(Icons.clear,color: Colors.grey),
+                        // ),
+                    ),
+                    onChanged: (value) {
+                      homeController.selectedCategory(6);
+                      dataBaseController.fetchData(search: value);
+                    },
+                  )),
+                  // const Spacer(),
                   Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(10)),
-                    child: Icon(Icons.filter_list_alt, color: Colors.white),
+                    child:
+                        const Icon(Icons.filter_list_alt, color: Colors.white),
                   ),
                 ],
               ),
@@ -118,11 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashFactory: NoSplash.splashFactory,
                         onTap: () {
                           homeController.selectedCategory.value = 1;
+                          dataBaseController.fetchData();
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Food",
+                            "All",
                             style: TextStyle(
                                 color:
                                     homeController.selectedCategory.value == 1
@@ -135,11 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashFactory: NoSplash.splashFactory,
                         onTap: () {
                           homeController.selectedCategory.value = 2;
+                          dataBaseController.fetchData();
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Fruits",
+                            "Food",
                             style: TextStyle(
                                 color:
                                     homeController.selectedCategory.value == 2
@@ -152,11 +176,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashFactory: NoSplash.splashFactory,
                         onTap: () {
                           homeController.selectedCategory.value = 3;
+                          dataBaseController.fetchData();
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Vegetables",
+                            "Fruits",
                             style: TextStyle(
                                 color:
                                     homeController.selectedCategory.value == 3
@@ -169,11 +194,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashFactory: NoSplash.splashFactory,
                         onTap: () {
                           homeController.selectedCategory.value = 4;
+                          dataBaseController.fetchData();
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Grocery",
+                            "Vegetables",
                             style: TextStyle(
                                 color:
                                     homeController.selectedCategory.value == 4
@@ -181,31 +207,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                         : Colors.black45),
                           ),
                         )),
+                    InkWell(
+                        highlightColor: Colors.white,
+                        splashFactory: NoSplash.splashFactory,
+                        onTap: () {
+                          homeController.selectedCategory.value = 5;
+                          dataBaseController.fetchData();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "Grocery",
+                            style: TextStyle(
+                                color:
+                                    homeController.selectedCategory.value == 5
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.black45),
+                          ),
+                        )),
                   ],
                 )),
-            Expanded(
-              child: GridView.builder(
-                itemCount: products.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 10,
-                  mainAxisExtent: size.height * 0.23
-                ),
-                itemBuilder: (context, index) {
-                  return productContainer(
-                      size: size,
-                      primaryColor: Theme.of(context).primaryColor,
-                      product: products[index],
-                  productIndex: index,
-                  onTap: (){
-                        homeController.addCart(product: products[index]);
-                        print("object ==> ${homeController.cartProducts.length}");
-                  }
-                  );
-                },
-              ),
-            ),
+            SizedBox(height: 20),
+            Obx(() {
+              if (dataBaseController.dishesData.isNotEmpty) {
+                return Expanded(
+                  child: GridView.builder(
+                    itemCount: dataBaseController.dishesData.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 10,
+                        mainAxisExtent: size.height * 0.28),
+                    itemBuilder: (context, index) {
+                      return productContainer(
+                          size: size,
+                          primaryColor: Theme.of(context).primaryColor,
+                          productIndex: index,
+                          onTap: () {
+                            dataBaseController.addToCart(
+                                dish: dataBaseController.dishesData[index]);
+                          });
+                    },
+                  ),
+                );
+              } else {
+                return const Expanded(
+                    child: Center(child: CircularProgressIndicator()));
+              }
+            })
           ],
         ),
       ),

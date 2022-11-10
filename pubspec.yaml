@@ -41,6 +41,8 @@ dependencies:
   animated_bottom_navigation_bar: ^1.1.0
   path: ^1.8.2
   http: ^0.13.5
+  shared_preferences: ^2.0.15
+  dotted_decoration: ^2.0.0
 
 dev_dependencies:
   flutter_test:

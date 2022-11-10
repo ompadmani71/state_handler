@@ -3,12 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:state_handler/controller/home_controller.dart';
 import '../models/product_model.dart';
 
 class DataBaseController extends GetxController {
+  HomeController homeController = Get.find();
+
   Database? dbs;
 
   String tableName = "dishe";
@@ -21,14 +23,22 @@ class DataBaseController extends GetxController {
   String column6_isLike = "isLike";
   String column7_image = "image";
 
-  RxList<String> images = <String>[].obs;
-
   RxList<Dish> dishDecordedList = <Dish>[].obs;
+
+  RxList<Dish> likeDishData = <Dish>[].obs;
+  RxList<Dish> cartDishData = <Dish>[].obs;
   RxList<Dish> dishesData = <Dish>[].obs;
+
+  RxInt totalCartItems = 0.obs;
+  RxInt totalCartPrice = 0.obs;
 
   Future<void> loadString({required String path}) async {
     String productData =  await rootBundle.loadString(path);
     dishDecordedList.value = dishFromJson(productData);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("isLoaded", true);
+
   }
 
   Future<Database?> init() async {
@@ -55,11 +65,6 @@ class DataBaseController extends GetxController {
     deleteTable();
     dbs = await init();
 
-    for (Dish product in dishDecordedList) {
-      String image = await getImagesBytes(url: product.image ?? "");
-      images.add(image);
-    }
-
     for (var i = 0; i < dishDecordedList.length; i++) {
       Dish dish = dishDecordedList[i];
 
@@ -72,7 +77,7 @@ class DataBaseController extends GetxController {
         dish.price,
         dish.quantity,
         dish.isLike,
-        images[i].toString(),
+        dish.image,
       ];
       int id = await dbs!.rawInsert(sql,arg);
       print("object jidbhvdcbjsk ==> $id");
@@ -85,50 +90,127 @@ class DataBaseController extends GetxController {
     await dbs!.execute(sql);
   }
 
-  Future<void> fetchData() async {
+  Future<void> fetchData({String? search}) async {
     dbs = await init();
-    // String sql = "SELECT $column1_ID, $column2_name, $column3_category, $column4_price, $column5_quantity, $column6_isLike FROM $tableName;";
-    String sql = "SELECT *FROM $tableName;";
+
+    String condition = "";
+
+    switch(homeController.selectedCategory.value){
+      case 2:
+        condition = "Food";
+        break;
+
+      case 3:
+        condition = "Fruit";
+        break;
+
+      case 4:
+        condition = "Vegetable";
+        break;
+
+      case 5:
+        condition = "Grocery";
+        break;
+
+      case 6:
+        condition = "%$search%";
+    }
+
+    String sql = "";
+
+    if(condition.isEmpty){
+      sql = "SELECT *FROM $tableName;";
+    } else {
+     sql = "SELECT *FROM $tableName WHERE $column3_category = '${condition}';";
+    }
 
     List<Map<String, dynamic>> data = await dbs!.rawQuery(sql);
     dishesData.value = dishFromJson(jsonEncode(data));
+    print("object ==> ${dishesData[0].quantity}");
+  }
 
-    // dishesData.value = data.forEach((element) {
-    //   Dish.fromJson(element);
-    // });
+  Future<void> fetchLikeData() async {
+    dbs = await init();
 
-    // for(var value in data){
-    //   Dish dish = Dish.fromJson(value);
-    //   dishesData.add(dish);
-    // }
-    print("object ==> ${dishesData[0].category}");
+     String sql = "SELECT *FROM $tableName WHERE $column6_isLike = 'true';";
+     List<Map<String, dynamic>> data = await dbs!.rawQuery(sql);
+     likeDishData.value = dishFromJson(jsonEncode(data));
+  }
+
+  Future<void> fetchCartData() async {
+    dbs = await init();
+
+     String sql = "SELECT *FROM $tableName WHERE $column5_quantity > 0;";
+     List<Map<String, dynamic>> data = await dbs!.rawQuery(sql);
+    cartDishData.value = dishFromJson(jsonEncode(data));
+
+    for(Dish dish in cartDishData){
+      totalCartItems.value = totalCartItems.value + dish.quantity!;
+    }
+
+    for(Dish dish in cartDishData){
+      totalCartPrice.value = totalCartPrice.value + (dish.quantity! * dish.price!);
+    }
+
+  }
+
+  Future<void> likeDish({ required int id}) async {
+    dbs = await init();
+
+    String sql = "UPDATE $tableName SET $column6_isLike = 'true' WHERE $column1_ID = $id";
+    await dbs!.rawUpdate(sql);
+    await fetchData();
+    await fetchLikeData();
+  }
+
+  Future<void> disLikeDish({ required int id}) async {
+    dbs = await init();
+
+    String sql = "UPDATE $tableName SET $column6_isLike = 'false' WHERE $column1_ID = $id";
+    await dbs!.rawUpdate(sql);
+    await fetchData();
+    await fetchLikeData();
   }
 
 
-  Future<String> getImagesBytes({required String url}) async {
+Future<void> addToCart({required Dish dish}) async {
+  dbs = await init();
 
-    ByteData bytes = await rootBundle.load(url);
-    ByteBuffer byteBuffer = bytes.buffer;
-    return base64Encode(Uint8List.view(byteBuffer));
+  int? quantity;
+  if(dish.quantity! >= 0){
+  quantity = dish.quantity! + 1;
   }
 
-//
-// Future<void> addToCart({required Product product, required int index}) async {
-//   dbs = await init();
-//
-//   int? quantity;
-//   if(product.quantity! > 0){
-//   quantity = product.quantity! - 1;
-//   }
-//
-//   String query = "UPDATE  $tableName SET $column4_quantity = ${quantity ?? 0} WHERE $column1_ID = ${product.id};";
-//   dbs!.rawUpdate(query);
-//
-//   String selectQuery = "SELECT *FROM $tableName WHERE $column1_ID = ${product.id};";
-//   List<Map<String, dynamic>> data = await dbs!.rawQuery(selectQuery);
-//   List<Product> recoverProduct = productFromJson(jsonEncode(data));
-//
-//   productFetchData[index] =  recoverProduct[0];
-// }
+  String query = "UPDATE  $tableName SET $column5_quantity = ${quantity ?? 0} WHERE $column1_ID = ${dish.id};";
+  await dbs!.rawUpdate(query);
+  //
+  // String selectQuery = "SELECT *FROM $tableName WHERE $column1_ID = ${dish.id};";
+  // List<Map<String, dynamic>> data = await dbs!.rawQuery(selectQuery);
+  print("wkodjibhj ==> $quantity");
+  await fetchData();
+await fetchCartData();
+}
+
+Future<void> removeQty({required Dish dish}) async {
+  dbs = await init();
+
+  int? quantity;
+  if(dish.quantity! > 1){
+  quantity = dish.quantity! - 1;
+  String query = "UPDATE  $tableName SET $column5_quantity = ${quantity ?? 0} WHERE $column1_ID = ${dish.id};";
+  await dbs!.rawUpdate(query);
+  await fetchData();
+  await fetchCartData();
+  }
+}
+
+Future<void> removeCart({required Dish dish}) async {
+  dbs = await init();
+
+  String query = "UPDATE  $tableName SET $column5_quantity = 0 WHERE $column1_ID = ${dish.id};";
+  await dbs!.rawUpdate(query);
+  await fetchData();
+  await fetchCartData();
+}
 
 }

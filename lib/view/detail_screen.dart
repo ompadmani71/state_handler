@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:state_handler/controller/database_controller.dart';
+import 'package:state_handler/controller/home_controller.dart';
 import 'package:state_handler/models/product_model.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -12,10 +14,12 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  DataBaseController dataBaseController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    Dish product = products[widget.productIndex];
+    Dish dish = dataBaseController.dishesData[widget.productIndex];
 
     return Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
@@ -23,8 +27,6 @@ class _DetailScreenState extends State<DetailScreen> {
           width: double.infinity,
           height: double.infinity,
           child: Stack(
-            // fit: StackFit.expand,
-            // clipBehavior: Clip.antiAliasWithSaveLayer,
             children: <Widget>[
               Container(
                 height: size.height,
@@ -67,12 +69,31 @@ class _DetailScreenState extends State<DetailScreen> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
                           color: Colors.white30),
-                      child: const Center(
-                        child: Icon(
-                          Icons.favorite_border,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: Obx(() => (dataBaseController
+                                  .dishesData[widget.productIndex].isLike ==
+                              "true")
+                          ? IconButton(
+                              onPressed: () async {
+                                await dataBaseController.disLikeDish(
+                                    id: dish.id!);
+                              },
+                              icon: const Icon(Icons.favorite,
+                                  color: Colors.redAccent),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            )
+                          : IconButton(
+                              onPressed: () async {
+                                await dataBaseController.likeDish(
+                                    id: dish.id!);
+                              },
+                              icon: const Icon(
+                                Icons.favorite_border,
+                                color: Colors.grey,
+                              ),
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            )),
                     ),
                   ],
                 ), //Container
@@ -101,7 +122,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${product.name}",
+                                  "${dish.name}",
                                   style: TextStyle(
                                       fontSize: 25,
                                       color: Colors.black,
@@ -111,7 +132,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  "\$ ${product.price}",
+                                  "\$ ${dish.price}",
                                   style: TextStyle(
                                       fontSize: 25,
                                       color: Theme.of(context).primaryColor,
@@ -148,13 +169,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                         )),
                                     // Obx(
                                     //   () =>
-                                          Text(
-                                        "${product.quantity}",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                                    Text(
+                                      "${dish.quantity}",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     // ),
                                     IconButton(
                                         onPressed: () {},
@@ -272,7 +293,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image: AssetImage("${product.image}"),
+                          image: AssetImage("${dish.image}"),
                           fit: BoxFit.cover)),
                 ),
               ),
