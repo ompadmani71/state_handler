@@ -146,6 +146,7 @@ class DataBaseController extends GetxController {
 
     totalCartItems(0);
     totalCartPrice(0);
+
     for(Dish dish in cartDishData){
       totalCartItems.value = totalCartItems.value + dish.quantity!;
     }
